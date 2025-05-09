@@ -4,8 +4,12 @@ import com.getechnologiesmx.directorio_api.model.Factura;
 import com.getechnologiesmx.directorio_api.model.Persona;
 import com.getechnologiesmx.directorio_api.service.DirectorioService;
 import com.getechnologiesmx.directorio_api.service.VentasService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,57 +17,47 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class DirectorioRestService {
 
-    @Autowired
-    private DirectorioService directorioService;
+    private final DirectorioService directorioService;
+    private final VentasService ventasService;
+    private final Logger logger = LoggerFactory.getLogger(DirectorioRestService.class);
 
-    @Autowired
-    private VentasService ventasService;
+    // PERSONAS
 
-    // ---------------- PERSONAS ----------------
+
+
+
+    @PostMapping("/personas")
+    public Persona crearPersona(@Valid @RequestBody Persona persona) {
+        logger.info("Creando persona: {}", persona);
+        return directorioService.guardarPersona(persona);
+    }
+    
+        
 
     @GetMapping("/personas")
-    public List<Persona> obtenerPersonas() {
+    public List<Persona> listarPersonas() {
         return directorioService.obtenerTodas();
     }
 
-    @GetMapping("/personas/{id}")
-    public ResponseEntity<Persona> obtenerPersonaPorId(@PathVariable Long id) {
-        return directorioService.obtenerPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/personas")
-    public ResponseEntity<Persona> crearPersona(@RequestBody Persona persona) {
-        return ResponseEntity.ok(directorioService.guardar(persona));
-    }
-
     @DeleteMapping("/personas/{id}")
-    public ResponseEntity<Void> eliminarPersona(@PathVariable Long id) {
-        Optional<Persona> persona = directorioService.obtenerPorId(id);
-        if (persona.isPresent()) {
-            directorioService.eliminar(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public void eliminarPersona(@PathVariable Long id) {
+        logger.info("Eliminando persona con id: {}", id);
+        directorioService.eliminarPersona(id);
     }
 
-    // ---------------- FACTURAS ----------------
-
-    @GetMapping("/facturas")
-    public List<Factura> obtenerFacturas() {
-        return ventasService.obtenerTodas();
-    }
-
-    @GetMapping("/personas/{id}/facturas")
-    public ResponseEntity<List<Factura>> obtenerFacturasPorPersona(@PathVariable Long id) {
-        return ResponseEntity.ok(ventasService.obtenerPorPersonaId(id));
-    }
+    // FACTURAS
 
     @PostMapping("/facturas")
-    public ResponseEntity<Factura> crearFactura(@RequestBody Factura factura) {
-        return ResponseEntity.ok(ventasService.guardar(factura));
+    public Factura crearFactura(@RequestBody Factura factura) {
+        logger.info("Creando factura: {}", factura);
+        return ventasService.guardarFactura(factura);
+    }
+
+    @GetMapping("/facturas")
+    public List<Factura> listarFacturas() {
+        return ventasService.obtenerTodas();
     }
 }

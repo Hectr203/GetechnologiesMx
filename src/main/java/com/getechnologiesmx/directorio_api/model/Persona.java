@@ -1,6 +1,7 @@
 package com.getechnologiesmx.directorio_api.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -15,15 +16,17 @@ public class Persona {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
+    
 
-    @Column(nullable = false)
+    @NotBlank(message = "El apellido paterno es obligatorio")
     private String apellidoPaterno;
 
-    private String apellidoMaterno; // Opcional para la 
+    // Este campo es opcional
+    private String apellidoMaterno;
 
-    @Column(nullable = false, unique = true)
+    @NotBlank(message = "La identificación es obligatoria")
     private String identificacion;
 
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL, orphanRemoval = true)

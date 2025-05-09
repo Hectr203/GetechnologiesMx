@@ -2,31 +2,31 @@ package com.getechnologiesmx.directorio_api.service;
 
 import com.getechnologiesmx.directorio_api.model.Persona;
 import com.getechnologiesmx.directorio_api.repository.PersonaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class DirectorioService {
 
-    @Autowired
-    private PersonaRepository personaRepository;
+    private final PersonaRepository personaRepository;
+
+    public Persona guardarPersona(Persona persona) {
+        return personaRepository.save(persona);
+    }
 
     public List<Persona> obtenerTodas() {
         return personaRepository.findAll();
     }
 
-    public Optional<Persona> obtenerPorId(Long id) {
+    public Optional<Persona> buscarPorId(Long id) {
         return personaRepository.findById(id);
     }
 
-    public Persona guardar(Persona persona) {
-        return personaRepository.save(persona);
-    }
-
-    public void eliminar(Long id) {
-        personaRepository.deleteById(id);
+    public void eliminarPersona(Long id) {
+        personaRepository.deleteById(id); // elimina también sus facturas por cascada
     }
 }
